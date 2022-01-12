@@ -5,3 +5,6 @@ lib
 tests/
 .envrc
 __pycache__
+.idea
+.DS_Store
+.coverage
