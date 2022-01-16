@@ -3,3 +3,4 @@ include
 lib
 .envrc
 __pycache__
+.idea
