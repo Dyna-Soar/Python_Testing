@@ -1,48 +1,24 @@
 import pytest
 from server import loadClubs, loadCompetitions
 from server import app
-from flask import Flask,render_template,request,redirect,flash,url_for, session
-
-# fixture part
-
-import os
-import tempfile
-
-#from flaskr import create_app
-#from flaskr.db import init_db
-
-@pytest.fixture
-def client():
-    db_fd, db_path = tempfile.mkstemp()
-    #app = create_app({'TESTING': True, 'DATABASE': db_path})
-    app = Flask(__name__)
-    app.config.from_pyfile({'TESTING': True, 'DATABASE': db_path})
-
-    #with app.test_client() as client:
-    #    with app.app_context():
-    #        init_db()
-    #    yield client
-
-    os.close(db_fd)
-    os.unlink(db_path)
-
-    return tempfile.mkstemp()
-
-
-# 11 tests unitaires
 
 
 def test_loadClubs():
+    """Test the loadClubs functions loads club's data"""
     clubs = loadClubs()
-    assert len(clubs) != 0
+    assert clubs[0]["name"] == "Simply Lift"
+    assert clubs[1]["points"] == "4"
 
 
 def test_loadCompetitions():
+    """Test the loadCompetitions functions loads competition's data"""
     competitions = loadCompetitions()
-    assert len(competitions) != 0
+    assert competitions[0]["name"] == "Spring Festival"
+    assert competitions[1]["numberOfPlaces"] == "13"
 
 
 def test_index_route():
+    """Test the index route renders the index template"""
     client = app.test_client()
     response = client.get("/")
     assert response.status_code == 200
@@ -50,21 +26,26 @@ def test_index_route():
 
 
 def test_showSummary_route():
-    """Post request"""
+    """Test the summary route renders welcome template with user's credentials"""
     email = "john@simplylift.co"
     client = app.test_client()
     response = client.post("/showSummary", data={'email': email})
     assert response.status_code == 200
     assert b"Welcome, john@simplylift.co" in response.data
 
+
 def test_wrong_showSummary_route():
+    """Test the summary route with unknown credentials returns the index template"""
     email = "wrong@email.co"
     client = app.test_client()
-    bad_response = client.post("/showSummary", data={'email': email})
-    assert b"Wrong Email" in bad_response.data
+    response = client.post("/showSummary", data={'email': email})
+    assert response.status_code == 200
+    assert b"Wrong Email" in response.data
+    assert b"Welcome to the GUDLFT Registration Portal!" in response.data
 
 
 def test_book_route():
+    """Test the book route renders book template with the competition and club's informations"""
     client = app.test_client()
     competition = "Spring Festival"
     club = "Simply Lift"
@@ -75,81 +56,72 @@ def test_book_route():
 
 
 def test_wrong_book_route():
+    """Test the book route with wrong club or competition render the welcome template"""
     client = app.test_client()
     competition = "Unknown competition"
     club = "Unknown club"
     url = f"/book/{competition}/{club}"
-    bad_response = client.get(url)
-    assert bad_response.status_code == 200
-    assert b'Something went wrong-please try again' in bad_response.data
-    assert b'Welcome Unknown club' in bad_response.data
-
-    # Make another test for good club, wrong competition
-
-    # Make another test for wrong club, good competition
+    response = client.get(url)
+    assert response.status_code == 200
+    assert b'Something went wrong-please try again' in response.data
 
 
 def test_purchasePlaces_route():
-    """Post request"""
+    """
+    Test the purchasePlaces route updates clubs places
+    Expect 3 points for 1 place
+    """
     competition = 'Spring Festival'
     club = 'Simply Lift'
     places = '2'
-    fake_competition_places = 20
-    fake_club_points = 10
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
     assert b'Great-booking complete!' in response.data
-    assert (fake_competition_places == fake_competition_places - int(places) and
-            fake_club_points == fake_club_points - int(places))
+    from server import clubs
+    assert int(clubs[0]["competitions"]["Spring Festival"]["places"]) == 2
 
 
 def test_toomuch_purchasePlaces_route():
-    """The user tries more places than the 12 limit"""
+    """The user tries to book more places than the 12 limit"""
     competition = 'Spring Festival'
     club = 'Simply Lift'
     places = '13'
-    fake_competition_places = 20
-    fake_club_points = 15
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
     assert b'Only 12 places maximum for each club. You tried to buy 13 places.' in response.data
+    assert b'Booking for Spring Festival' in response.data
 
 
 def test_notenough_purchasePlaces_route():
-    """The user try to buy more places than he has points"""
+    """
+    The user try to buy more places than he has points
+    Expect 3 points for 1 place
+    In this test case the club has 10 points
+    """
     competition = 'Spring Festival'
     club = 'Simply Lift'
-    places = '11'
-    fake_competition_places = 20
-    fake_club_points = 10
+    # The club has 10 points
+    places = 5
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
-    assert b'You do not have enought points to buy 11 places. You currently have only 10 points' in response.data
+    assert b'You do not have enough points to buy 5 places. You need 3 points for every place. You currently have only 10 points' in response.data
+    assert b'Booking for Spring Festival' in response.data
+    from server import competitions
+    assert int(competitions[0]["numberOfPlaces"]) != int(competitions[0]["numberOfPlaces"]) - places
 
 
-"""
-def test_login():
-    email = "john@simplylift.co"
+def test_point_display():
+    """Test the point-display route renders the index with with current points of clubs"""
     client = app.test_client()
-    response = client.post("/", data={'email': email})
-    assert session['user'] == email
-"""
+    response = client.get("/point-display")
+    assert b"Simply Lift has 10 points" in response.data
 
-"""
-def test_bad_login():
-    email = "error@simplylift.co"
-    client = app.test_client()
-    response = client.post("/", data={'email': email})
-    assert response.data == "Wrong email"
-"""
 
 def test_logout():
-    """Test logout"""
-    email = "john@simplylift.co"
+    """Test logout route redirects to index"""
     client = app.test_client()
-    response = client.post("/", data={'email': email})
     response = client.get("/logout")
-    assert session['user'] == None
+    assert response.status_code == 302
