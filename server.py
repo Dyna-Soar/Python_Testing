@@ -49,7 +49,6 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
-    #competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
 
     # Find the index of the club in clubs data
     club_index = 0
@@ -82,7 +81,7 @@ def purchasePlaces():
             break
 
     # update the competition's places
-    competitions[competition_index]['numberOfPlaces'] = int(competition[competition_index]['numberOfPlaces']) - placesRequired
+    competitions[competition_index]['numberOfPlaces'] = int(competition[competition_index]['numberOfPlaces']) - 3*placesRequired
 
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
