@@ -32,7 +32,7 @@ def showSummary():
     print(emails)
     if request.form['email'] not in emails:
         flash("Unknown email. Please enter the club's email.")
-        return redirect(url_for('index'))
+        return render_template('index.html')
     if request.form['email'] in emails:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
         return render_template('welcome.html', club=club, competitions=competitions)
