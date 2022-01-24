@@ -57,16 +57,18 @@ def purchasePlaces():
             club_index = i
             break
 
-    # if the competition already has data in competition, it updates it
-    if clubs[club_index]["competitions"][competition["name"]]:
-        clubs[club_index]["competitions"][competition["name"]]["places"] -= int(placesRequired)
+    # if competitions data exist in club data, update that data
+    if "competitions" in clubs[club_index]:
+        # if the club already has booked places, update the number of places
+        if [competition["name"]] in clubs[club_index]["competitions"]:
+            clubs[club_index]["competitions"][competition["name"]]["places"] -= int(placesRequired)
 
-    # if competitions data exist but not for this competition
-    elif clubs[club_index]["competitions"]:
-        data_competition = {"places_purchased": places_required}
-        clubs[club_index]["competitions"][competition["name"]] = data_competition
+        # if the club has never purchased places for this competition
+        else:
+            data_competition = {"places_purchased": places_required}
+            clubs[club_index]["competitions"][competition["name"]] = data_competition
 
-    # for new places in the competition for the club, update the clubs
+    # if the club has never purchased any place create a competitons dict with the places data
     else:
         competitions_dict = {}
         data_competition = {"places": placesRequired}
@@ -76,12 +78,12 @@ def purchasePlaces():
     # Find the index of the competition in competitions data
     competition_index = 0
     for i in range(len(competitions)):
-        if competitions[i]["name"] == club["name"]:
+        if competitions[i]["name"] == competition["name"]:
             competition_index = i
             break
 
     # update the competition's places
-    competitions[competition_index]['numberOfPlaces'] = int(competition[competition_index]['numberOfPlaces']) - 3*placesRequired
+    competitions[competition_index]['numberOfPlaces'] = int(competitions[competition_index]['numberOfPlaces']) - 3*placesRequired
 
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
