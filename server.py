@@ -60,12 +60,12 @@ def purchasePlaces():
     # if competitions data exist in club data, update that data
     if "competitions" in clubs[club_index]:
         # if the club already has booked places, update the number of places
-        if [competition["name"]] in clubs[club_index]["competitions"]:
+        if competition["name"] in clubs[club_index]["competitions"]:
             clubs[club_index]["competitions"][competition["name"]]["places"] -= int(placesRequired)
 
         # if the club has never purchased places for this competition
         else:
-            data_competition = {"places_purchased": places_required}
+            data_competition = {"places": placesRequired}
             clubs[club_index]["competitions"][competition["name"]] = data_competition
 
     # if the club has never purchased any place create a competitons dict with the places data
@@ -75,6 +75,9 @@ def purchasePlaces():
         competitions_dict[competition["name"]] = data_competition
         clubs[club_index]["competitions"] = competitions_dict
 
+    # Update points
+    clubs[club_index]["points"] = int(clubs[club_index]["points"]) - 3*placesRequired
+
     # Find the index of the competition in competitions data
     competition_index = 0
     for i in range(len(competitions)):
@@ -83,7 +86,7 @@ def purchasePlaces():
             break
 
     # update the competition's places
-    competitions[competition_index]['numberOfPlaces'] = int(competitions[competition_index]['numberOfPlaces']) - 3*placesRequired
+    competitions[competition_index]['numberOfPlaces'] = int(competitions[competition_index]['numberOfPlaces']) - placesRequired
 
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
