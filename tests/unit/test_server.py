@@ -40,7 +40,7 @@ def test_wrong_showSummary_route():
     client = app.test_client()
     response = client.post("/showSummary", data={'email': email})
     assert response.status_code == 200
-    assert b"Wrong Email" in response.data
+    assert b"Unknown email. Please enter the club's email." in response.data
     assert b"Welcome to the GUDLFT Registration Portal!" in response.data
 
 
@@ -90,7 +90,7 @@ def test_toomuch_purchasePlaces_route():
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
-    assert b'Only 12 places maximum for each club. You tried to buy 13 places.' in response.data
+    assert b'You tried to purchase 13 places. Only 12 places per competitions are available.' in response.data
     assert b'Booking for Spring Festival' in response.data
 
 
@@ -107,7 +107,7 @@ def test_notenough_purchasePlaces_route():
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
-    assert b'You do not have enough points to buy 5 places. You need 3 points for every place. You currently have only 10 points' in response.data
+    assert b'You are trying to buy 5 places. One place costs 3 points. You only have 10 points.' in response.data
     assert b'Booking for Spring Festival' in response.data
     from server import competitions
     assert int(competitions[0]["numberOfPlaces"]) != int(competitions[0]["numberOfPlaces"]) - places
