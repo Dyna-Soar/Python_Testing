@@ -59,7 +59,7 @@ def purchasePlaces():
     if "competitions" in club:
         if competition["name"] in club["competitions"]:
             if placesRequired + club["competitions"][competition["name"]]["places"] > 12:
-                flash(f'You tried to purchase {placesRequired} places. You already have {club["competitions"][competition["name"]]["places"]} Only 12 places per competitions are available.')
+                flash(f'You tried to purchase {placesRequired} places. You already have {club["competitions"][competition["name"]]["places"]} places. Only 12 places per competitions are available.')
                 return render_template('booking.html', club=club, competition=competition)
 
     # Find the index of the club in clubs data
