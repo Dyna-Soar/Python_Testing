@@ -50,6 +50,11 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
+    # Limit purchase when the club tries to purchase more places than he has points
+    if int(club["points"]) < 3*placesRequired:
+        flash(f'You are trying to buy {placesRequired} places. One place costs 3 points. You only have {club["points"]} points.')
+        return render_template('booking.html', club=club, competition=competition)
+
     # Find the index of the club in clubs data
     club_index = 0
     for i in range(len(clubs)):
