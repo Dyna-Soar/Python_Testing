@@ -28,6 +28,7 @@ def test_purchasing_places_by_different_clubs():
     assert clubs[1]["points"] == "4"
     assert clubs[2]["points"] == "12"
 
+    # Add a new competition to competitions variable with 5 places
     import server
     server.competitions.append({"name": "Competition Test", "numberOfPlaces": "5"})
 
@@ -37,16 +38,20 @@ def test_purchasing_places_by_different_clubs():
 
     client = app.test_client()
 
+    # Test successful purchase of 4 places by club 1
     response = client.post("/purchasePlaces", data={"club": clubs[0]["name"], "competition": competitions[2]["name"], 'places': 4})
     assert response.status_code == 200
     assert b'Great-booking complete!' in response.data
 
+    # Test successful purchase of 1 place by club 2
     response = client.post("/purchasePlaces", data={"club": clubs[1]["name"], "competition": competitions[2]["name"], 'places': 1})
     assert response.status_code == 200
     assert b'Great-booking complete!' in response.data
 
+    # Test unsuccessful purchase of 1 place by club 3 when no places are available
     response = client.post("/purchasePlaces", data={"club": clubs[2]["name"], "competition": competitions[2]["name"], 'places': 1})
     assert response.status_code == 200
+    assert b'Error: You are trying to purchase more places than available. You tried to purchase 1 places, when only 0 are available.' in response.data
 
 
 def test_every_function():
