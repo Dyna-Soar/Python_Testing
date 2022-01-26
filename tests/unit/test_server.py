@@ -4,14 +4,15 @@ from server import app
 
 
 def test_loadClubs():
-    """Test the loadClubs functions loads club's data"""
+    """Test the loadClubs function successfully loads clubs data"""
     clubs = loadClubs()
     assert clubs[0]["name"] == "Simply Lift"
-    assert clubs[1]["points"] == "4"
+    assert clubs[1]["email"] == "admin@irontemple.com"
+    assert clubs[2]["points"] == "12"
 
 
 def test_loadCompetitions():
-    """Test the loadCompetitions functions loads competition's data"""
+    """Test the loadCompetitions function succesfully loads competitions data"""
     competitions = loadCompetitions()
     assert competitions[0]["name"] == "Spring Festival"
     assert competitions[1]["numberOfPlaces"] == "13"
@@ -47,21 +48,19 @@ def test_wrong_showSummary_route():
 def test_book_route():
     """Test the book route renders book template with the competition and club's informations"""
     client = app.test_client()
-    competition = "Spring Festival"
+    competition = "Fall Classic"
     club = "Simply Lift"
-    url = f"/book/{competition}/{club}"
-    response = client.get(url)
+    response = client.get(f"/book/{competition}/{club}")
     assert response.status_code == 200
-    assert b'Booking for Spring Festival' in response.data
+    assert b'Booking for Fall Classic' in response.data
 
 
 def test_wrong_book_route():
-    """Test the book route with wrong club or competition render the welcome template"""
+    """Test the book route with unknown competition render the welcome template"""
     client = app.test_client()
     competition = "Unknown competition"
-    club = "Unknown club"
-    url = f"/book/{competition}/{club}"
-    response = client.get(url)
+    club = "She Lifts"
+    response = client.get(f"/book/{competition}/{club}")
     assert response.status_code == 200
     assert b'Something went wrong-please try again' in response.data
 
