@@ -117,6 +117,8 @@ def test_point_display():
     client = app.test_client()
     response = client.get("/point-display")
     assert b"Simply Lift has 10 points" in response.data
+    assert b"Iron Temple has 4 points" in response.data
+    assert b"She Lifts has 12 points" in response.data
 
 
 def test_logout():
