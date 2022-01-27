@@ -8,8 +8,16 @@ class PerfTest(HttpUser):
         self.client.get("")
 
     @task
-    def show_summary(self):
+    def showSummary(self):
         self.client.post("/showSummary", {"email": "john@simplylift.co"})
+
+    @task
+    def book(self):
+        self.client.get("/book/Spring Festival/Iron Temple")
+
+    @task
+    def purchasePlaces(self):
+        self.client.post("/purchasePlaces", {'competition': "Fall Classic", 'club': "She Lifts", 'places': 1})
 
     @task
     def point_display(self):
