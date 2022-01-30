@@ -133,6 +133,11 @@ def purchasePlaces():
 
 
 # TODO: Add route for points display
+@app.route('/point-display')
+def points_display():
+    for club in clubs:
+        flash(f'{club["name"]} has {club["points"]} points')
+    return render_template('index')
 
 
 @app.route('/logout')
