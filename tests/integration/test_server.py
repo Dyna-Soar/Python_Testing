@@ -1,9 +1,14 @@
 import pytest
 from server import app, loadClubs, loadCompetitions
+from importlib import reload
+import server
+
 
 
 def test_purchase_places_and_point_display():
     """Test the purchase and the point display update correctly"""
+    reload(server)
+
     club_name = "Simply Lift"
     points = "13"
     competition_name = "Spring Festival"
@@ -12,7 +17,7 @@ def test_purchase_places_and_point_display():
 
     client = app.test_client()
 
-    response = client.post("/purchasePlaces", {"club": club_name, "competition": competition_name, 'places': reserved_places})
+    response = client.post("/purchasePlaces", data={"club": club_name, "competition": competition_name, 'places': reserved_places})
     assert response.status_code == 200
 
     response = client.get("/point-display")
@@ -22,6 +27,7 @@ def test_purchase_places_and_point_display():
 
 def test_purchasing_places_by_different_clubs():
     """Test different clubs trying to purchase the places of the same competition"""
+    reload(server)
 
     clubs = loadClubs()
     assert clubs[0]["points"] == "13"
@@ -29,7 +35,6 @@ def test_purchasing_places_by_different_clubs():
     assert clubs[2]["points"] == "12"
 
     # Add a new competition to competitions variable with 5 places
-    import server
     server.competitions.append({"name": "Competition Test", "numberOfPlaces": "5"})
 
     from server import competitions
@@ -56,6 +61,8 @@ def test_purchasing_places_by_different_clubs():
 
 def test_every_function():
     """Test every function"""
+    reload(server)
+
     club_name = "Simply Lift"
     points = "13"
 

@@ -1,6 +1,9 @@
 import pytest
 from server import loadClubs, loadCompetitions
 from server import app
+from importlib import reload
+import server
+
 
 
 def test_loadClubs():
@@ -20,6 +23,7 @@ def test_loadCompetitions():
 
 def test_index_route():
     """Test the index route renders the index template"""
+    reload(server)
     client = app.test_client()
     response = client.get("/")
     assert response.status_code == 200
@@ -28,6 +32,7 @@ def test_index_route():
 
 def test_showSummary_route():
     """Test the summary route renders welcome template with user's credentials"""
+    reload(server)
     email = "john@simplylift.co"
     client = app.test_client()
     response = client.post("/showSummary", data={'email': email})
@@ -37,16 +42,18 @@ def test_showSummary_route():
 
 def test_wrong_showSummary_route():
     """Test the summary route with unknown credentials returns the index template"""
+    reload(server)
     email = "wrong@email.co"
     client = app.test_client()
     response = client.post("/showSummary", data={'email': email})
     assert response.status_code == 200
-    assert b"Unknown email. Please enter the club's email." in response.data
+    assert b"Unknown email. Please enter the club&#39;s email." in response.data
     assert b"Welcome to the GUDLFT Registration Portal!" in response.data
 
 
 def test_book_route():
     """Test the book route renders book template with the competition and club's informations"""
+    reload(server)
     client = app.test_client()
     competition = "Fall Classic"
     club = "Simply Lift"
@@ -57,6 +64,7 @@ def test_book_route():
 
 def test_wrong_book_route():
     """Test the book route with unknown competition render the welcome template"""
+    reload(server)
     client = app.test_client()
     competition = "Unknown competition"
     club = "She Lifts"
@@ -70,6 +78,7 @@ def test_purchasePlaces_route():
     Test the purchasePlaces route updates clubs places
     Expect 3 points for 1 place
     """
+    reload(server)
     competition = 'Spring Festival'
     club = 'Simply Lift'
     places = '2'
@@ -83,6 +92,7 @@ def test_purchasePlaces_route():
 
 def test_toomuch_purchasePlaces_route():
     """The user tries to book more places than the 12 limit"""
+    reload(server)
     competition = 'Spring Festival'
     club = 'Simply Lift'
     places = '13'
@@ -97,16 +107,17 @@ def test_notenough_purchasePlaces_route():
     """
     The user try to buy more places than he has points
     Expect 3 points for 1 place
-    In this test case the club has 10 points
+    In this test case the club has 13 points
     """
+    reload(server)
     competition = 'Spring Festival'
     club = 'Simply Lift'
-    # The club has 10 points
+    # The club has 13 points
     places = 5
     client = app.test_client()
     response = client.post("/purchasePlaces", data={'competition': competition, 'club': club, 'places': places})
     assert response.status_code == 200
-    assert b'You are trying to buy 5 places. One place costs 3 points. You only have 10 points.' in response.data
+    assert b'You are trying to buy 5 places. One place costs 3 points. You only have 13 points.' in response.data
     assert b'Booking for Spring Festival' in response.data
     from server import competitions
     assert int(competitions[0]["numberOfPlaces"]) != int(competitions[0]["numberOfPlaces"]) - places
@@ -114,15 +125,17 @@ def test_notenough_purchasePlaces_route():
 
 def test_point_display():
     """Test the point-display route renders the index with with current points of clubs"""
+    reload(server)
     client = app.test_client()
     response = client.get("/point-display")
-    assert b"Simply Lift has 10 points" in response.data
+    assert b"Simply Lift has 13 points" in response.data
     assert b"Iron Temple has 4 points" in response.data
     assert b"She Lifts has 12 points" in response.data
 
 
 def test_logout():
     """Test logout route redirects to index"""
+    reload(server)
     client = app.test_client()
     response = client.get("/logout")
     assert response.status_code == 302
