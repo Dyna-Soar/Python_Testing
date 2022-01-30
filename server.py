@@ -50,6 +50,11 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
 
 
+# Limit purchase when the club tries to purchase more places than available
+    if placesRequired > int(competition["numberOfPlaces"]):
+        flash(f'Error: You are trying to purchase more places than available. You tried to purchase {placesRequired} places, when only {competition["numberOfPlaces"]} are available.')
+        return render_template('booking.html', club=club, competition=competition)
+
     # Redirect to booking if the club is trying to purchase too many places(12)
     if placesRequired > 12:
         flash(f'You tried to purchase {placesRequired} places. Only 12 places per competitions are available.')
@@ -65,7 +70,6 @@ def purchasePlaces():
     # Limit purchase when the club tries to purchase more places than he has points
     if int(club["points"]) < 3*placesRequired:
         flash(f'You are trying to buy {placesRequired} places. One place costs 3 points. You only have {club["points"]} points.')
-        return render_template('booking.html', club=club, competition=competition)
 
     # Find the index of the club in clubs data
     club_index = 0
