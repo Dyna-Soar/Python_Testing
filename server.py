@@ -42,10 +42,51 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
+    global clubs
+    global competitions
+
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+
+    # Find the index of the club in clubs data
+    club_index = 0
+    for i in range(len(clubs)):
+        if clubs[i]["name"] == club["name"]:
+            club_index = i
+            break
+
+    # if competitions data exist in club data, update that data
+    if "competitions" in clubs[club_index]:
+        # if the club already has booked places, update the number of places
+        if competition["name"] in clubs[club_index]["competitions"]:
+            clubs[club_index]["competitions"][competition["name"]]["places"] -= int(placesRequired)
+
+        # if the club has never purchased places for this competition
+        else:
+            data_competition = {"places": placesRequired}
+            clubs[club_index]["competitions"][competition["name"]] = data_competition
+
+    # if the club has never purchased any place create a competitons dict with the places data
+    else:
+        competitions_dict = {}
+        data_competition = {"places": placesRequired}
+        competitions_dict[competition["name"]] = data_competition
+        clubs[club_index]["competitions"] = competitions_dict
+
+    # Update points
+    clubs[club_index]["points"] = int(clubs[club_index]["points"]) - 3*placesRequired
+
+    # Find the index of the competition in competitions data
+    competition_index = 0
+    for i in range(len(competitions)):
+        if competitions[i]["name"] == competition["name"]:
+            competition_index = i
+            break
+
+    # update the competition's places
+    competitions[competition_index]['numberOfPlaces'] = int(competitions[competition_index]['numberOfPlaces']) - placesRequired
+
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
