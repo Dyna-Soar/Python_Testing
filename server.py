@@ -55,7 +55,7 @@ def purchasePlaces():
 def points_display():
     for club in clubs:
         flash(f'{club["name"]} has {club["points"]} points')
-    return render_template('index')
+    return render_template('index.html')
 
 
 @app.route('/logout')
