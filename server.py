@@ -20,14 +20,25 @@ app.secret_key = 'something_special'
 competitions = loadCompetitions()
 clubs = loadClubs()
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    emails = []
+    for i in range(len(clubs)):
+        emails.append(clubs[i]['email'])
+    print(emails)
+    if request.form['email'] not in emails:
+        flash("Unknown email. Please enter the club's email.")
+        return render_template('index.html')
+    if request.form['email'] in emails:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        return render_template('welcome.html', club=club, competitions=competitions)
+
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
