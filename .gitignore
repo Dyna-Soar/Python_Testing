@@ -3,6 +3,6 @@ include
 lib
 .envrc
 __pycache__
-.idea
 .DS_Store
 .coverage
+.idea/
