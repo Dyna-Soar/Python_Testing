@@ -49,6 +49,18 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
+    # Redirect to booking if the club is trying to purchase too many places(12)
+    if placesRequired > 12:
+        flash(f'You tried to purchase {placesRequired} places. Only 12 places per competitions are available.')
+        return render_template('booking.html',club=club,competition=competition)
+
+    # Redirect to booking if the club has purchased places in the competition and is trying to purchase too many places(12)
+    if "competitions" in club:
+        if competition["name"] in club["competitions"]:
+            if placesRequired + club["competitions"][competition["name"]]["places"] > 12:
+                flash(f'You tried to purchase {placesRequired} places. You already have {club["competitions"][competition["name"]]["places"]} places. Only 12 places per competitions are available.')
+                return render_template('booking.html', club=club, competition=competition)
+
     # Find the index of the club in clubs data
     club_index = 0
     for i in range(len(clubs)):
