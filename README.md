@@ -51,6 +51,6 @@
    
    - To run the unit and integration tests type <code>python -m pytest -v tests/</code>
    - To get an html report of the tests, add <code>--html=report.html</code> as an option, such in <code>python -m pytest -v tests/ --html=report.html</code>
-   - To get a coverage report run <code>coverage run -m pytest tests/</code>
+   - To get a coverage report run <code>coverage report -m</code>
    - To get a performance test report with locust: run the server with <code>flask run</code>, than  run <code>locust -f tests/performance/locustfile.py</code>
 
