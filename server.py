@@ -32,9 +32,11 @@ def showSummary():
     for i in range(len(clubs)):
         emails.append(clubs[i]['email'])
     print(emails)
+
     if request.form['email'] not in emails:
         flash("Unknown email. Please enter the club's email.")
         return render_template('index.html')
+
     if request.form['email'] in emails:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
         return render_template('welcome.html', club=club, competitions=competitions)
@@ -44,14 +46,17 @@ def showSummary():
 def book(competition, club):
     foundClub = False
     foundCompetition = False
+
     try:
         foundClub = [c for c in clubs if c['name'] == club][0]
     except IndexError:
         print(f'Error: "{club}" club was not found')
+
     try:
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
     except IndexError:
         print(f'Error: "{competition}" competition was not found')
+
     if foundClub and foundCompetition:
         return render_template('booking.html', club=foundClub, competition=foundCompetition)
     else:
@@ -89,6 +94,7 @@ def purchasePlaces():
     # Limit purchase when the club tries to purchase more places than he has points
     if int(club["points"]) < 3*placesRequired:
         flash(f'You are trying to buy {placesRequired} places. One place costs 3 points. You only have {club["points"]} points.')
+        return render_template('booking.html', club=club, competition=competition)
 
     # Find the index of the club in clubs data
     club_index = 0
@@ -108,7 +114,7 @@ def purchasePlaces():
             data_competition = {"places": placesRequired}
             clubs[club_index]["competitions"][competition["name"]] = data_competition
 
-    # if the club has never purchased any place create a competitons dict with the places data
+    # if the club has never purchased any place create a competitions dict with the places data
     else:
         competitions_dict = {}
         data_competition = {"places": placesRequired}
