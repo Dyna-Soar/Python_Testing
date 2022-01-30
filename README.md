@@ -48,4 +48,9 @@
 
     We also like to show how well we're testing, so there's a module called 
     [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+   
+   - To run the unit and integration tests type <code>python -m pytest -v tests/</code>
+   - To get an html report of the tests, add <code>--html=report.html</code> as an option, such in <code>python -m pytest -v tests/ --html=report.html</code>
+   - To get a coverage report run <code>coverage run -m pytest tests/</code>
+   - To get a performance test report with locust: run the server with <code>flask run</code>, than  run <code>locust -f tests/performance/locustfile.py</code>
 
